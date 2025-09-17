@@ -1,10 +1,4 @@
-//Cadastro de pedidos
- // Sistemas de pizzaria completo
-    // importar as bibliotecas necessárias
-
-    import * as fs from "fs"; // módulo para manipular arquivos
-    import * as path from "path"; // módulo para lidar com caminhos de arquivos
-    import * as rs from "readline-sync"; // módulo para receber entradas do usuário
+import * as rs from "readline-sync";
 
 type Pizza = {
   nome: string;
@@ -13,7 +7,12 @@ type Pizza = {
   tamanho?: 'pequena' | 'media' | 'grande';
 }
 
-// Cria um array de pizzas
+type Bebida = {
+  nome: string;
+  preco: number;
+  tamanho?: string;
+}
+
 const cardapio: Pizza[] = [
   {
     nome: '1 - Margherita',
@@ -29,44 +28,141 @@ const cardapio: Pizza[] = [
     nome: '3 - Quatro Queijos',
     ingredientes: ['muçarela', 'gorgonzola', 'parmesão', 'provolone'],
     preco: 35.00,
+  },
+
+   {
+    nome: '4 - Portuguesa',
+    ingredientes: ['molho de tomate', 'muçarela', 'presunto', 'ovo', 'cebola', 'azeitona'],
+    preco: 35.00,
+  },
+
+     {
+    nome: '5 - Frango com caputiry',
+    ingredientes: ['molho de tomate','muçarela', 'frango desfiado', 'catupiry'],
+    preco: 45.00,
+  },
+    {
+    nome: '6 - Pepperoni',
+    ingredientes: ['molho de tomate', 'muçarela', 'pepperoni'],
+    preco: 45.00,
+  },
+    {
+    nome: '7 - Vegetariana',
+    ingredientes: ['molho de tomate', 'muçarela', 'pimentão', 'cebola', 'tomate', 'azeitona', 'milho'],
+    preco: 45.00,
+  },
+
+    {
+    nome: '8 - Bacon com Cheddar',
+    ingredientes: ['molho de tomate', 'muçarela', 'bacon', 'cheddar'],
+    preco: 45.00,
   }
 ];
 
-// Exemplo de uso: mostrar nomes e preços
-cardapio.forEach(pizza => {
-  console.log(`${pizza.nome} - R$ ${pizza.preco.toFixed(2)} \n - Ingrediente:${pizza.ingredientes}\n`);
-});
+const bebidas: Bebida[] = [
+  { nome: '1 - Coca-Cola 500ml', preco: 5.00, tamanho: '500ml' },
+  { nome: '2 - Guaraná 500ml', preco: 4.50, tamanho: '500ml' },
+  { nome: '3 - Soda 500ml', preco: 4.00, tamanho: '300ml' },
+  { nome: '4 - pepsi 500ml', preco: 4.00, tamanho: '300ml' },
+  { nome: '5 - Suco Natural 300ml', preco: 6.00, tamanho: '300ml' },
+  { nome: '6 - Agua 300ml', preco: 2.00, tamanho: '300ml' },
+];
 
-const pedido: Pizza[] = [];
+const pedidoPizzas: Pizza[] = [];
+const pedidoBebidas: Bebida[] = [];
 
 let continuar = true;
 
 while (continuar) {
+  // Mostrar cardápio de pizzas
+  cardapio.forEach(pizza => {
+    console.log(`${pizza.nome} - R$ ${pizza.preco.toFixed(2)} \n - Ingredientes: ${pizza.ingredientes.join(', ')}\n`);
+  });
+
+  // Escolha da pizza
   const escolhaStr = rs.question("Digite o numero da pizza que deseja: ");
   const escolhaNum = Number(escolhaStr);
 
   if (isNaN(escolhaNum) || escolhaNum < 1 || escolhaNum > cardapio.length) {
     console.log("Escolha inválida! Tente novamente.");
-    continue; // volta para o começo do loop para tentar outra vez
+    continue;
   }
 
-  const pizzaEscolhida = cardapio[escolhaNum - 1];
-  pedido.push(pizzaEscolhida);
-  console.log(`Pizza "${pizzaEscolhida.nome}" adicionada ao pedido.`);
+  const tamanhoEscolhido = rs.question("Escolha o tamanho (pequena, media, grande): ").toLowerCase();
 
-  // Perguntar se quer continuar
+  if (!['pequena', 'media', 'grande'].includes(tamanhoEscolhido)) {
+    console.log("Tamanho inválido! Tente novamente.");
+    continue;
+  }
+
+  const pizzaBase = cardapio[escolhaNum - 1];
+
+  // Cria pizza com tamanho selecionado, preço fixo (sem ajuste)
+  const pizzaEscolhida: Pizza = {
+    ...pizzaBase,
+    tamanho: tamanhoEscolhido as 'pequena' | 'media' | 'grande',
+  };
+
+  pedidoPizzas.push(pizzaEscolhida);
+  console.log(`Pizza "${pizzaEscolhida.nome}" - ${pizzaEscolhida.tamanho} adicionada ao pedido.`);
+
+
+  // Perguntar se quer continuar adicionando pizzas
   const querContinuar = rs.question("Quer adicionar outra pizza? (s/n) ");
   if (querContinuar.toLowerCase() !== 's') {
     continuar = false;
   }
+
 }
 
+const querBebida = rs.question("\nDeseja adicionar bebidas ao seu pedido? (s/n): ").toLowerCase();
 
-// Mostrar resumo do pedido
+if (querBebida === 's') {
+  let continuarBebidas = true;
+
+  while (continuarBebidas) {
+    console.log("\n--- Bebidas Disponíveis ---");
+    bebidas.forEach(bebida => {
+      console.log(`${bebida.nome} - R$ ${bebida.preco.toFixed(2)}`);
+    });
+
+    const escolhaBebidaStr = rs.question("Digite o numero da bebida que deseja: ");
+    const escolhaBebidaNum = Number(escolhaBebidaStr);
+
+    if (isNaN(escolhaBebidaNum) || escolhaBebidaNum < 1 || escolhaBebidaNum > bebidas.length) {
+      console.log("Escolha inválida de bebida! Tente novamente.");
+    } else {
+      const bebidaEscolhida = bebidas[escolhaBebidaNum - 1];
+      pedidoBebidas.push(bebidaEscolhida);
+      console.log(`Bebida "${bebidaEscolhida.nome}" adicionada ao pedido.`);
+    }
+
+    const maisBebidas = rs.question("Deseja adicionar outra bebida? (s/n): ");
+    if (maisBebidas.toLowerCase() !== 's') {
+      continuarBebidas = false;
+    }
+  }
+}
+
+// === RESUMO FINAL ===
 console.log("\nSeu pedido final:");
+
 let total = 0;
-pedido.forEach((pizza, i) => {
-  console.log(`${i + 1} - ${pizza.nome} - R$ ${pizza.preco.toFixed(2)}`);
-  total += pizza.preco;
-});
-console.log(`Total a pagar: R$ ${total.toFixed(2)}`);
+
+if (pedidoPizzas.length > 0) {
+  console.log("\nPizzas:");
+  pedidoPizzas.forEach((pizza, i) => {
+    console.log(`${i + 1} - ${pizza.nome} - ${pizza.tamanho} - R$ ${pizza.preco.toFixed(2)}`);
+    total += pizza.preco;
+  });
+}
+
+if (pedidoBebidas.length > 0) {
+  console.log("\nBebidas:");
+  pedidoBebidas.forEach((bebida, i) => {
+    console.log(`${i + 1} - ${bebida.nome} - R$ ${bebida.preco.toFixed(2)}`);
+    total += bebida.preco;
+  });
+}
+
+console.log(`\nTotal a pagar: R$ ${total.toFixed(2)}`);
