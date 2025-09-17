@@ -30,6 +30,17 @@ type Bebida = {
   tamanho?: string;
 }
 
+//Criar a mesma interface para as sobremesas]
+type Sobremesa = {
+  nome: string;
+  preco: number;
+}
+
+//Criar para a forma de pagamento
+type FormadePagamento = {
+    nome: string;
+}
+
 //Criar o menu inicial
     console.log("----------- PIZZARIA HENRIQUE --------------");
     console.log("\nO que deseja fazer?")
@@ -99,9 +110,16 @@ const bebidas: Bebida[] = [
   { nome: '6 - Agua 300ml', preco: 2.00, tamanho: '300ml' },
 ];
 
+const sobremesas: Sobremesa[] = [
+  { nome: '1 - Pizza Doce de Chocolate - Pequena', preco: 35.00,},
+  { nome: '2 - Pizza Doce de Banana Nevada - Pequena', preco: 34.50,},
+  { nome: '3 - Torta Holandesa - Pequena', preco: 14.00,},
+];
+
 //Criar a variavel que vai receber o pedido
 const pedidoPizzas: Pizza[] = [];
 const pedidoBebidas: Bebida[] = [];
+const pedidoSobremesa: Sobremesa[] = [];
 
 //Deixar true para rodar o loop até que o usuario finalize o pedido e caso tenha alguma informação errada ele retornar do principio
 let continuar = true;
@@ -180,6 +198,36 @@ if (querBebida === 's') {
   }
 }
 
+//Sobremesa
+const querSobremesa = rs.question("\nDeseja adicionar alguma sobremesa ao seu pedido? (s/n): ").toLowerCase(); //Perguntar se quer adicionar uma sobremesa ao pedido
+
+if (querSobremesa === 's') {
+  let continuarSobremesa = true; //Caso seja sim a respota ele continua
+
+  while (continuarSobremesa) {
+    console.log("\n--- Sobremesas Disponíveis ---");
+    sobremesas.forEach(sobremesas => {
+      console.log(`${sobremesas.nome} - R$ ${sobremesas.preco.toFixed(2)}`);
+    });
+
+    const escolhaSobremesaStr = rs.question("Digite o numero da sobremesa que deseja: ");
+    const escolhaSobremesaNum = Number(escolhaSobremesaStr); //Transformar em numero
+
+    if (isNaN(escolhaSobremesaNum) || escolhaSobremesaNum < 1 || escolhaSobremesaNum > sobremesas.length) { //Verificar se é um numero
+      console.log("Escolha inválida de sobremesa! Tente novamente.");
+    } else {
+      const SobremesaEscolhida = bebidas[escolhaSobremesaNum - 1];
+      pedidoSobremesa.push(SobremesaEscolhida);
+      console.log(`Sobremesa "${SobremesaEscolhida.nome}" adicionada ao pedido.`);
+    }
+
+    const maisSobremesa = rs.question("Deseja adicionar outra sobremesa? (s/n): ");
+    if (maisSobremesa.toLowerCase() !== 's') {
+      continuarSobremesa = false;
+    }
+  }
+}
+
 //Fim do pedido
 console.log("\nSeu pedido final:");
 
@@ -188,7 +236,7 @@ let total = 0;
 if (pedidoPizzas.length > 0) { //Mostrar as pizzas escolhidas
   console.log("\nPizzas:");
   pedidoPizzas.forEach((pizza, i) => {
-    console.log(`${i + 1} - ${pizza.nome} - ${pizza.tamanho} - R$ ${pizza.preco.toFixed(2)}`);
+    console.log(`${i + 1} -) ${pizza.nome} - ${pizza.tamanho} - R$ ${pizza.preco.toFixed(2)}`);
     total += pizza.preco;
   });
 }
@@ -196,13 +244,51 @@ if (pedidoPizzas.length > 0) { //Mostrar as pizzas escolhidas
 if (pedidoBebidas.length > 0) { //Mostrar as bebidas escolhidas
   console.log("\nBebidas:");
   pedidoBebidas.forEach((bebida, i) => {
-    console.log(`${i + 1} - ${bebida.nome} - R$ ${bebida.preco.toFixed(2)}`);
+    console.log(`${i + 1} -) ${bebida.nome} - R$ ${bebida.preco.toFixed(2)}`);
     total += bebida.preco;
   });
 }
     
-    console.log(`\nTotal a pagar: R$ ${total.toFixed(2)}`);
+if (pedidoSobremesa.length > 0) { //Mostrar as sobremesas escolhidas
+  console.log("\nSobremesa:");
+  pedidoSobremesa.forEach((sobremesa, i) => {
+    console.log(`${i + 1} -) ${sobremesa.nome} - R$ ${sobremesa.preco.toFixed(2)}`);
+    total += sobremesa.preco;
+  });
+}
 
+  console.log(`\nTotal a pagar: R$ ${total.toFixed(2)}`); //Mostrar quanto devera ser pago
+
+//Forma de pagamento
+console.log("\nFormas de pagamento disponíveis:");
+const formasPagamento: FormadePagamento[] = [
+  { nome: "Dinheiro" },
+  { nome: "Cartão de Débito" },
+  { nome: "Cartão de Crédito" },
+  { nome: "Pix" }
+];
+
+formasPagamento.forEach((fp, i) => {
+  console.log(`${i + 1} - ${fp.nome}`);
+});
+
+const escolhaPagamentoStr = rs.question("\nDigite o numero da forma de pagamento: ");
+const escolhaPagamentoNum = Number(escolhaPagamentoStr);
+
+let formaPagamentoEscolhida: FormadePagamento;
+
+if (
+  isNaN(escolhaPagamentoNum) ||
+  escolhaPagamentoNum < 1 ||
+  escolhaPagamentoNum > formasPagamento.length
+) {
+  console.log("Forma de pagamento inválida! Será registrado como 'Não informado'.");
+  formaPagamentoEscolhida = { nome: "Não informado" };
+} else {
+  formaPagamentoEscolhida = formasPagamento[escolhaPagamentoNum - 1];
+}
+
+console.log(`\nForma de pagamento escolhida: ${formaPagamentoEscolhida.nome}`);
 
     //Salvar no csv
     if (pedidoPizzas.length > 0) { //caso o pedido tenha sido feito ele salva
@@ -211,7 +297,7 @@ if (pedidoBebidas.length > 0) { //Mostrar as bebidas escolhidas
   const data_hora = agora.toLocaleString("pt-BR");
   const mes = String(agora.getMonth() + 1);
 
-  const linha = `Pizza do dia ${data_hora}; mes: ${mes}: ${pizzasStr}\n`; //forma padrao para salvar (nome da pizza)(data e hora do pedido)(mes)
+  const linha = `Pizza do dia ${data_hora}; mes: ${mes}: ${pizzasStr} pagamento: ${formaPagamentoEscolhida.nome}\n`; //forma padrao para salvar (nome da pizza)(data e hora do pedido)(mes)(forma de pagamento)
   fs.appendFileSync(inputData, linha, "utf-8");
  }
     if (pedidoBebidas.length > 0) { //salvar as bebidas da mesma maneira
@@ -220,8 +306,18 @@ if (pedidoBebidas.length > 0) { //Mostrar as bebidas escolhidas
   const data_hora = agora.toLocaleString("pt-BR");
   const mes = String(agora.getMonth() + 1);
 
-  const linha = `Bebidas do dia ${data_hora}; mes: ${mes}: ${bebidasStr}\n`;//forma padrao para salvar (nome da bebida)(data e hora do pedido)(mes)
+  const linha = `Bebidas do dia ${data_hora}; mes: ${mes}: ${bebidasStr} pagamento: ${formaPagamentoEscolhida.nome}\n`;//forma padrao para salvar (nome da bebida)(data e hora do pedido)(mes)(forma de pagamento)
   fs.appendFileSync(inputData, linha, "utf-8");
 
+    if (pedidoSobremesa.length > 0) { //salvar as sobremesas da mesma maneira
+  const sobremesaStr = pedidoSobremesa.map(s => `${s.nome}`).join(", ");
+  const agora = new Date(); //criar para salvar a data
+  const data_hora = agora.toLocaleString("pt-BR");
+  const mes = String(agora.getMonth() + 1);
+
+  const linha = `Sobremesas do dia ${data_hora}; mes: ${mes}: ${sobremesaStr} pagamento: ${formaPagamentoEscolhida.nome}\n`;//forma padrao para salvar (nome da sobremesa)(data e hora do pedido)(mes)(forma de pagamento)
+  fs.appendFileSync(inputData, linha, "utf-8");
     }
+}
+
 }
