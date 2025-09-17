@@ -32,10 +32,10 @@ type Bebida = {
 
 //Criar o menu inicial
     console.log("----------- PIZZARIA HENRIQUE --------------");
-    console.log("O que deseja fazer?")
-    console.log("\n1 -) Realizar um pedido")
-    console.log("\n2 -) Cadastrar")
-    console.log("\n3 -) Sair")
+    console.log("\nO que deseja fazer?")
+    console.log("1 -) Realizar um pedido")
+    console.log("2 -) Cadastrar")
+    console.log("3 -) Sair")
 
     const  escolhaInc = rs.question("\nDigite o numero do que deseja fazer: "); //Criar constante da ação a fazer
 
@@ -211,7 +211,7 @@ if (pedidoBebidas.length > 0) { //Mostrar as bebidas escolhidas
   const data_hora = agora.toLocaleString("pt-BR");
   const mes = String(agora.getMonth() + 1);
 
-  const linha = `Pizza: ${pizzasStr};${data_hora};${mes}\n`; //forma padrao para salvar (nome da pizza)(data e hora do pedido)(mes)
+  const linha = `Pizza do dia ${data_hora}; mes: ${mes}: ${pizzasStr}\n`; //forma padrao para salvar (nome da pizza)(data e hora do pedido)(mes)
   fs.appendFileSync(inputData, linha, "utf-8");
  }
     if (pedidoBebidas.length > 0) { //salvar as bebidas da mesma maneira
@@ -220,7 +220,7 @@ if (pedidoBebidas.length > 0) { //Mostrar as bebidas escolhidas
   const data_hora = agora.toLocaleString("pt-BR");
   const mes = String(agora.getMonth() + 1);
 
-  const linha = `Bebidas: ${bebidasStr};${data_hora};${mes}\n`;//forma padrao para salvar (nome da bebida)(data e hora do pedido)(mes)
+  const linha = `Bebidas do dia ${data_hora}; mes: ${mes}: ${bebidasStr}\n`;//forma padrao para salvar (nome da bebida)(data e hora do pedido)(mes)
   fs.appendFileSync(inputData, linha, "utf-8");
 
     }
